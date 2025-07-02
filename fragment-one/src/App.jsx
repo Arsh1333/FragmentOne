@@ -188,13 +188,13 @@ function App() {
 
   return (
     <>
-      <h1>Fragment One</h1>
+      <h1>Fragment One </h1>
       {submit ? (
         <>
           <p>Thank you 🌿 You’ve sent your fragment for today.</p>
           {receivedFragment && (
             <div className="received-fragment">
-              <h3>From another soul:</h3>
+              <h3 className="soul">From another soul:</h3>
               <p>“{receivedFragment}”</p>
             </div>
           )}
@@ -208,7 +208,9 @@ function App() {
             onChange={(e) => setFragment(e.target.value)}
             id="fragment"
           />
-          <button type="submit">Submit</button>
+          <button className="btn" type="submit">
+            Submit
+          </button>
         </form>
       )}
     </>
