@@ -10,6 +10,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { deleteDoc, doc } from "firebase/firestore";
 
 import "./App.css";
 
@@ -150,6 +151,39 @@ function App() {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const cleanOldFragments = async () => {
+      const lastCleanupDate = localStorage.getItem("lastCleanupDate");
+      const today = new Date().toDateString();
+
+      if (lastCleanupDate === today) return; // Already cleaned today
+
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+      const todayTimestamp = Timestamp.fromDate(todayMidnight);
+
+      const q = query(
+        collection(db, "fragments"),
+        where("createdAt", "<", todayTimestamp)
+      );
+
+      try {
+        const snapshot = await getDocs(q);
+        const deletePromises = snapshot.docs.map((docSnap) =>
+          deleteDoc(doc(db, "fragments", docSnap.id))
+        );
+        await Promise.all(deletePromises);
+        console.log("Old fragments deleted.");
+
+        localStorage.setItem("lastCleanupDate", today);
+      } catch (err) {
+        console.log("Error deleting old fragments", err);
+      }
+    };
+
+    cleanOldFragments();
   }, []);
 
   return (
